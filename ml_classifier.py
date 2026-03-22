@@ -12,7 +12,10 @@ class PostureClassifier:
         self.is_trained = False
         self.samples = []
         self.labels = []
-        self.model_path = model_path
+        
+        # Ensure path is absolute relative to the script to prevent macOS CWD issues
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.model_path = os.path.join(base_dir, model_path)
         
         # Temporal smoothing prevents rapid jittering by requiring sustained classifications
         self.smoothing_window = smoothing_window

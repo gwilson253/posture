@@ -10,5 +10,6 @@ dependencies = [
     "opencv-python>=4.13.0.92",
     "pandas>=3.0.1",
     "plyer>=2.1.0",
+    "pyobjus>=1.2.4",
     "scikit-learn>=1.8.0",
 ]

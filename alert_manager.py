@@ -42,12 +42,20 @@ class AlertManager:
         """Triggers a desktop notification asynchronously so UI doesn't freeze."""
         def send_notification():
             try:
-                notification.notify(
-                    title="Posture Alert",
-                    message="You've been slouching. Sit up straight!",
-                    app_name="Posture Monitor",
-                    timeout=5
-                )
+                import platform
+                import subprocess
+                if platform.system() == 'Darwin':
+                    subprocess.run([
+                        'osascript', '-e',
+                        'display notification "You have been slouching. Sit up straight!" with title "Posture Alert"'
+                    ], check=True)
+                else:
+                    notification.notify(
+                        title="Posture Alert",
+                        message="You've been slouching. Sit up straight!",
+                        app_name="Posture Monitor",
+                        timeout=5
+                    )
                 print("Alert notification sent.")
             except Exception as e:
                 print(f"Failed to send notification: {e}")
