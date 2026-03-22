@@ -1,0 +1,14 @@
+[project]
+name = "posture"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = "==3.11.*"
+dependencies = [
+    "mediapipe==0.10.14",
+    "numpy>=2.4.3",
+    "opencv-python>=4.13.0.92",
+    "pandas>=3.0.1",
+    "plyer>=2.1.0",
+    "scikit-learn>=1.8.0",
+]
