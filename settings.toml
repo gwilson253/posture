@@ -1,0 +1,10 @@
+[notifications]
+# Available types: "banner", "speech", "sound", "dialog"
+# Multiple types can be listed — all will fire simultaneously.
+#
+# banner  — macOS Notification Center banner (requires Script Editor permission
+#            in System Settings → Notifications)
+# speech  — speaks "Sit up straight!" aloud via `say`
+# sound   — plays a chime via `afplay`
+# dialog  — modal popup you must click to dismiss
+types = ["speech", "sound"]

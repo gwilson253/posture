@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="google.protobuf")
 import cv2
 from posture_analyzer import PostureAnalyzer
 from observability import ObservabilityLayer

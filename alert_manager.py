@@ -1,5 +1,6 @@
 import time
-from plyer import notification
+import tomllib
+import os
 import threading
 
 class AlertManager:
@@ -11,7 +12,15 @@ class AlertManager:
         """
         self.slouch_duration_threshold = slouch_duration_threshold
         self.cooldown_duration = cooldown_duration
-        
+
+        settings_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "settings.toml")
+        try:
+            with open(settings_path, "rb") as f:
+                settings = tomllib.load(f)
+            self.notification_types = settings.get("notifications", {}).get("types", ["banner"])
+        except FileNotFoundError:
+            self.notification_types = ["banner"]
+
         self.slouch_start_time = None
         self.last_alert_time = 0.0
 
@@ -41,23 +50,25 @@ class AlertManager:
     def trigger_alert(self):
         """Triggers a desktop notification asynchronously so UI doesn't freeze."""
         def send_notification():
-            try:
-                import platform
-                import subprocess
-                if platform.system() == 'Darwin':
-                    subprocess.run([
-                        'osascript', '-e',
-                        'display notification "You have been slouching. Sit up straight!" with title "Posture Alert"'
-                    ], check=True)
-                else:
-                    notification.notify(
-                        title="Posture Alert",
-                        message="You've been slouching. Sit up straight!",
-                        app_name="Posture Monitor",
-                        timeout=5
-                    )
-                print("Alert notification sent.")
-            except Exception as e:
-                print(f"Failed to send notification: {e}")
+            import subprocess
+            for ntype in self.notification_types:
+                try:
+                    if ntype == "banner":
+                        subprocess.run([
+                            'osascript', '-e',
+                            'display notification "You have been slouching. Sit up straight!" with title "Posture Alert"'
+                        ], check=True)
+                    elif ntype == "speech":
+                        subprocess.run(['say', 'Sit up straight!'], check=True)
+                    elif ntype == "sound":
+                        subprocess.run(['afplay', '/System/Library/Sounds/Sosumi.aiff'], check=True)
+                    elif ntype == "dialog":
+                        subprocess.run([
+                            'osascript', '-e',
+                            'display dialog "Sit up straight!" buttons {"OK"} giving up after 10'
+                        ], check=True)
+                except Exception as e:
+                    print(f"Failed to send '{ntype}' notification: {e}")
+            print("Alert notification sent.")
 
         threading.Thread(target=send_notification, daemon=True).start()
