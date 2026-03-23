@@ -44,7 +44,7 @@ class ObservabilityLayer:
         # ML Data Collection UI
         if not ml_trained:
             cv2.putText(frame_bgr, f"ML Data: Good={good_count}, Bad={bad_count}", (20, 130), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2, cv2.LINE_AA)
             if good_count > 0 and bad_count > 0:
                 cv2.putText(frame_bgr, "Press 't' to Train ML", (20, 155), 
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 1, cv2.LINE_AA)

@@ -47,10 +47,12 @@ class PostureAnalyzer:
                      landmarks[self.mp_pose.PoseLandmark.LEFT_EAR.value].y]
             l_shoulder = [landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].x, 
                           landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
-            l_hip = [landmarks[self.mp_pose.PoseLandmark.LEFT_HIP.value].x, 
-                     landmarks[self.mp_pose.PoseLandmark.LEFT_HIP.value].y]
             
-            posture_angle = self.calculate_angle(l_ear, l_shoulder, l_hip)
+            # Since the hip might not be in frame, we create a pseudo-landmark 
+            # directly below the shoulder to represent a vertical torso line.
+            vertical_ref = [l_shoulder[0], l_shoulder[1] + 1.0]
+            
+            posture_angle = self.calculate_angle(l_ear, l_shoulder, vertical_ref)
             
             # Neck horizontal displacement (Text Neck tracking)
             # The difference in X between the ear and shoulder.

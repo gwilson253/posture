@@ -6,7 +6,7 @@ AutoPosture is an educational hobby project designed to help you learn about com
 
 AutoPosture uses a standard USB camera continuously fed into an **Observability Layer** built with OpenCV. Behind the scenes, the **Google MediaPipe Pose** neural network processes each frame to detect 33 3D body landmarks.
 
-By applying geometric math to the coordinates of your **Ear, Shoulder, and Hip**, the application calculates an angle that determines how upright you are sitting. If your posture angle drops below a certain threshold for a continuous period, it triggers your computer's native desktop notification system so you know to sit up straight!
+By applying geometric math to the coordinates of your **Ear, Shoulder, and a vertical reference point**, the application calculates an angle that determines how upright you are sitting. If your posture angle drops below a certain threshold for a continuous period, it triggers your computer's native desktop notification system so you know to sit up straight!
 
 ### Architecture Flow
 
@@ -15,7 +15,7 @@ graph TD
     A[USB Camera] -->|Frames| B(OpenCV Capture)
     B -->|BGR to RGB| C{MediaPipe Pose NN}
     C -->|Detects 33 Landmarks| D[PostureAnalyzer]
-    D -->|Calc Angle: Ear-Shoulder-Hip| D
+    D -->|Calc Angle: Ear-Shoulder-Vertical| D
     D -->|Score| E[ObservabilityLayer]
     D -->|Is < 150 deg?| F{AlertManager}
     F -->|Continuous Slouch > 3s| G[Plyer OS Alert]
@@ -30,7 +30,24 @@ This project uses `uv` for lightning-fast dependency and environment management.
 2. In your terminal, run `uv run main.py` to start the application.
 3. The **Observability Layer** window will open, showing you the neural network's perception of your skeletal structure.
 4. Try slouching for more than 3 seconds—you should see the skeletal lines turn red and receive a desktop notification!
-5. Press `q` while focused on the video window to quit.
+
+### Controls
+
+Make sure the video window is in focus when pressing these keys:
+
+- `c`: **Calibrate Baseline**. Sets your current posture as the geometric baseline.
+- `g`: **Record Good Posture**. Press or hold to collect positive ML samples.
+- `s`: **Record Slouching**. Press or hold to collect negative ML samples. 
+- `t`: **Train ML Model**. Trains a new model using the collected `g` and `s` samples.
+- `w`: **Save ML Model**. Saves the trained model to disk.
+- `q`: **Quit**. Exits the application.
+
+### Retraining the ML Model
+
+If you find that the existing machine learning model is inaccurate for your setup, you can easily train a new one!
+1. Delete the `posture_model.pkl` file from the project directory.
+2. Restart the application.
+3. Collect new samples using the `g` and `s` keys, press `t` to train, and `w` to save your new personalized `posture_model.pkl` file!
 
 ## Concepts Learned
 
