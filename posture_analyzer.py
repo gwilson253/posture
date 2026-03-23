@@ -6,6 +6,7 @@ class PostureAnalyzer:
     def __init__(self):
         self.mp_pose = mp.solutions.pose
         self.pose = self.mp_pose.Pose(
+            model_complexity=0,
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5
         )
@@ -68,7 +69,4 @@ class PostureAnalyzer:
         if not results or not results.pose_landmarks:
             return None
             
-        flat = []
-        for lm in results.pose_landmarks.landmark:
-            flat.extend([lm.x, lm.y, lm.z])
-        return flat
+        return [coord for lm in results.pose_landmarks.landmark for coord in (lm.x, lm.y, lm.z)]

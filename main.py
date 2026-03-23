@@ -1,6 +1,14 @@
+import os
+os.nice(10)  # Lower process priority so it yields to foreground apps
+# Cap thread pools before importing OpenCV or MediaPipe (which spin up threads on import)
+os.environ['OMP_NUM_THREADS'] = '2'
+os.environ['OPENBLAS_NUM_THREADS'] = '2'
+os.environ['MKL_NUM_THREADS'] = '2'
+
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="google.protobuf")
 import cv2
+cv2.setNumThreads(2)
 from posture_analyzer import PostureAnalyzer
 from observability import ObservabilityLayer
 from alert_manager import AlertManager
@@ -15,7 +23,9 @@ def main():
     
     # Initialize the camera (0 is usually the default webcam or USB camera)
     cap = cv2.VideoCapture(0)
-    
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
     if not cap.isOpened():
         print("Error: Could not open video capture device.")
         return
@@ -37,24 +47,32 @@ def main():
     print("Press 'w' to SAVE the trained ML model permanently.")
     print("Press 'q' in the video window to quit.")
 
+    frame_count = 0
+    results, angle, neck_dx, flat_landmarks = None, None, None, None
+
     while True:
         success, frame = cap.read()
         if not success:
             print("Failed to grab camera frame. Exiting...")
             break
 
-        # MediaPipe expects RGB images, OpenCV captures in BGR.
-        image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        
-        # Performance optimization: prevent modifying image to save memory during processing
-        image_rgb.flags.writeable = False
-        
-        # Analyze posture
-        results, angle, neck_dx = analyzer.analyze(image_rgb)
-        flat_landmarks = analyzer.get_flat_landmarks(results)
+        frame_count += 1
+
+        # Run MediaPipe inference every other frame — posture changes slowly
+        if frame_count % 2 == 0:
+            # Downscale before inference — MediaPipe doesn't need full camera resolution
+            small_frame = cv2.resize(frame, (480, 270))
+            image_rgb = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
+
+            # Performance optimization: prevent modifying image to save memory during processing
+            image_rgb.flags.writeable = False
+
+            # Analyze posture
+            results, angle, neck_dx = analyzer.analyze(image_rgb)
+            flat_landmarks = analyzer.get_flat_landmarks(results)
         
         # Check keystrokes
-        key = cv2.waitKey(5) & 0xFF
+        key = cv2.waitKey(33) & 0xFF
         if key == ord('q'):
             break
         elif key == ord('c') and angle is not None and neck_dx is not None:

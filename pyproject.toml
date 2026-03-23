@@ -13,3 +13,8 @@ dependencies = [
     "pyobjus>=1.2.4",
     "scikit-learn>=1.8.0",
 ]
+
+[dependency-groups]
+dev = [
+    "py-spy>=0.4.1",
+]

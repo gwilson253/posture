@@ -54,19 +54,19 @@ class AlertManager:
             for ntype in self.notification_types:
                 try:
                     if ntype == "banner":
-                        subprocess.run([
+                        subprocess.Popen([
                             'osascript', '-e',
                             'display notification "You have been slouching. Sit up straight!" with title "Posture Alert"'
-                        ], check=True)
+                        ])
                     elif ntype == "speech":
-                        subprocess.run(['say', 'Sit up straight!'], check=True)
+                        subprocess.Popen(['say', 'Sit up straight!'])
                     elif ntype == "sound":
-                        subprocess.run(['afplay', '/System/Library/Sounds/Sosumi.aiff'], check=True)
+                        subprocess.Popen(['afplay', '/System/Library/Sounds/Sosumi.aiff'])
                     elif ntype == "dialog":
-                        subprocess.run([
+                        subprocess.Popen([
                             'osascript', '-e',
                             'display dialog "Sit up straight!" buttons {"OK"} giving up after 10'
-                        ], check=True)
+                        ])
                 except Exception as e:
                     print(f"Failed to send '{ntype}' notification: {e}")
             print("Alert notification sent.")
